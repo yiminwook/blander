@@ -1,0 +1,19 @@
+# Blender backup files
+*.blend1
+*.blend2
+*.blend@
+
+# Blender temporary files
+*.blend.lock
+
+# Blender render files
+*.exr
+*.hdr
+*.tif
+*.png
+*.jpg
+
+# Cache files
+*.pyc
+*.pyo
+__pycache__/
