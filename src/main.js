@@ -1,28 +1,26 @@
-import TextSign from './TextSign.js';
+import * as THREE from "three";
 
-const textSign = new TextSign();
+const canvas = document.getElementById("three-canvas");
+const renderer = new THREE.WebGLRenderer({ canvas });
+renderer.setSize(window.innerWidth, window.innerHeight);
 
-const condition = true;
-// const condition = false;
+const scene = new THREE.Scene();
+const camera = new THREE.PerspectiveCamera(
+  75, // FOV
+  window.innerWidth / window.innerHeight, // Aspect ratio
+  0.1, // Near
+  1000 // Far
+);
 
-const promise = new Promise((resolve, reject) => {
-	if (condition) {
-		resolve('성공!');
-	} else {
-		reject('실패!');
-	}
-});
-promise
-	.then(message => {
-		console.log(message);
-		textSign.elem.innerHTML = message;
-		textSign.elem.dataset.state = 'success';
-	})
-	.catch(error => {
-		console.log(error);
-		textSign.elem.innerHTML = error;
-		textSign.elem.dataset.state = 'failure';
-	})
-	.finally(() => {
-		console.log('끝에 실행');
-	});
+camera.position.x = 0;
+camera.position.y = 2;
+camera.position.z = 5;
+scene.add(camera);
+
+const geometry = new THREE.BoxGeometry(1, 1, 1);
+const meterial = new THREE.MeshBasicMaterial({ color: "red" });
+const mesh = new THREE.Mesh(geometry, meterial);
+
+scene.add(mesh);
+
+renderer.render(scene, camera); // 복수의 카메라를 사용할 수 있음
