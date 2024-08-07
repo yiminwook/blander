@@ -30,10 +30,12 @@ export default function example() {
   // renderer.setClearColor(0x00ff00, 1); // 캔버스 배경 투명하게, hex, opacity
 
   const scene = new THREE.Scene();
+
   scene.background = new THREE.Color("blue");
+  scene.fog = new THREE.Fog("blue", 8, 12);
 
   const light = new THREE.DirectionalLight(0xffffff, 1);
-  light.position.set(2, 1, 5);
+  light.position.set(0, 2, 10);
   scene.add(light);
 
   const perspectiveCamera = new THREE.PerspectiveCamera(
@@ -42,14 +44,18 @@ export default function example() {
     0.1, // Near
     1000 // Far
   );
-  perspectiveCamera.position.set(2, 2, 5);
+  perspectiveCamera.position.set(0, 2, 10);
   scene.add(perspectiveCamera);
 
   const geometry = new THREE.BoxGeometry(1, 1, 1);
   const meterial = new THREE.MeshStandardMaterial({ color: "red" });
-  const mesh = new THREE.Mesh(geometry, meterial);
 
-  scene.add(mesh);
+  const meshs = Array.from({ length: 10 }, (_, i) => i).map((i) => {
+    const mesh = new THREE.Mesh(geometry, meterial);
+    mesh.position.x = i * 2 - 10;
+    scene.add(mesh);
+    return mesh;
+  });
 
   const clock = new THREE.Clock();
 
@@ -57,10 +63,16 @@ export default function example() {
     // 360도 === 2 * Math.PI
     // 1초에 360도 회전
     // Math.PI / 180 = 1도
-    const time = clock.getElapsedTime();
-    console.log(time);
-    mesh.rotation.y = THREE.MathUtils.degToRad(time * 6);
-    mesh.rotation.x = (Math.PI * time) / 180;
+    const delta = clock.getDelta();
+    meshs.forEach((mesh) => {
+      mesh.rotateY(delta);
+    });
+    // console.log(delta);
+    // mesh.rotation.y += delta;
+    // mesh.position.y += delta;
+    // if (mesh.position.y > 3) {
+    //   mesh.position.y = 0;
+    // }
     renderer.render(scene, perspectiveCamera); // 복수의 카메라를 사용할 수 있음
     // window.requestAnimationFrame(draw);
     renderer.setAnimationLoop(draw);
