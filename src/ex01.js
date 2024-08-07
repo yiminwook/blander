@@ -1,12 +1,40 @@
 import * as THREE from "three";
 
+// const orthographicCamera = new THREE.OrthographicCamera(
+//   -(window.innerWidth / window.innerHeight), //left
+//   window.innerWidth / window.innerHeight, //right
+//   1, // top
+//   -1, // bottom
+//   0.1, // Near
+//   1000 // Far
+// );
+// orthographicCamera.position.x = 1;
+// orthographicCamera.position.y = 2;
+// orthographicCamera.position.z = 5;
+// orthographicCamera.lookAt(0, 0, 0);
+// orthographicCamera.zoom = 0.5;
+// orthographicCamera.updateProjectionMatrix();
+
 export default function example() {
   const canvas = document.getElementById("three-canvas");
-  const renderer = new THREE.WebGLRenderer({ canvas, antialias: true });
+
+  const renderer = new THREE.WebGLRenderer({
+    canvas,
+    antialias: true,
+    // alpha: true,
+  });
+
   renderer.setSize(window.innerWidth, window.innerHeight);
   renderer.setPixelRatio(window.devicePixelRatio > 1 ? 2 : 1); // 레티나 디스플레이 대응
+  // renderer.setClearAlpha(0); // 캔버스 배경 투명하게, opacity
+  // renderer.setClearColor(0x00ff00, 1); // 캔버스 배경 투명하게, hex, opacity
 
   const scene = new THREE.Scene();
+  scene.background = new THREE.Color("blue");
+
+  const light = new THREE.DirectionalLight(0xffffff, 1);
+  light.position.set(2, 1, 5);
+  scene.add(light);
 
   const perspectiveCamera = new THREE.PerspectiveCamera(
     75, // FOV
@@ -14,33 +42,29 @@ export default function example() {
     0.1, // Near
     1000 // Far
   );
-  perspectiveCamera.position.x = 1;
-  perspectiveCamera.position.y = 2;
-  perspectiveCamera.position.z = 5;
+  perspectiveCamera.position.set(2, 2, 5);
   scene.add(perspectiveCamera);
 
-  // const orthographicCamera = new THREE.OrthographicCamera(
-  //   -(window.innerWidth / window.innerHeight), //left
-  //   window.innerWidth / window.innerHeight, //right
-  //   1, // top
-  //   -1, // bottom
-  //   0.1, // Near
-  //   1000 // Far
-  // );
-  // orthographicCamera.position.x = 1;
-  // orthographicCamera.position.y = 2;
-  // orthographicCamera.position.z = 5;
-  // orthographicCamera.lookAt(0, 0, 0);
-  // orthographicCamera.zoom = 0.5;
-  // orthographicCamera.updateProjectionMatrix();
-
   const geometry = new THREE.BoxGeometry(1, 1, 1);
-  const meterial = new THREE.MeshBasicMaterial({ color: "red" });
+  const meterial = new THREE.MeshStandardMaterial({ color: "red" });
   const mesh = new THREE.Mesh(geometry, meterial);
 
   scene.add(mesh);
 
-  renderer.render(scene, perspectiveCamera); // 복수의 카메라를 사용할 수 있음
+  const clock = new THREE.Clock();
+
+  function draw() {
+    // 360도 === 2 * Math.PI
+    // 1초에 360도 회전
+    // Math.PI / 180 = 1도
+    const time = clock.getElapsedTime();
+    console.log(time);
+    mesh.rotation.y = THREE.MathUtils.degToRad(time * 6);
+    mesh.rotation.x = (Math.PI * time) / 180;
+    renderer.render(scene, perspectiveCamera); // 복수의 카메라를 사용할 수 있음
+    // window.requestAnimationFrame(draw);
+    renderer.setAnimationLoop(draw);
+  }
 
   window.addEventListener("resize", () => {
     perspectiveCamera.aspect = window.innerWidth / window.innerHeight;
@@ -49,4 +73,6 @@ export default function example() {
     renderer.setPixelRatio(window.devicePixelRatio > 1 ? 2 : 1);
     renderer.render(scene, perspectiveCamera);
   });
+
+  draw();
 }
