@@ -1,4 +1,5 @@
 import * as THREE from "three";
+import gsap from "gsap";
 
 // const orthographicCamera = new THREE.OrthographicCamera(
 //   -(window.innerWidth / window.innerHeight), //left
@@ -64,8 +65,12 @@ export default function example() {
     // 1초에 360도 회전
     // Math.PI / 180 = 1도
     const delta = clock.getDelta();
-    meshs.forEach((mesh) => {
-      mesh.rotateY(delta);
+    meshs.forEach((mesh, i) => {
+      gsap.to(mesh.position, {
+        duration: 1, // 1초
+        y: 2 * i,
+        z: 3,
+      });
     });
     // console.log(delta);
     // mesh.rotation.y += delta;
