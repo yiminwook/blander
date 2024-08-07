@@ -1,6 +1,7 @@
 import * as THREE from "three";
 import gsap from "gsap";
 import Stats from "stats.js";
+import dat from "dat.gui";
 
 // const orthographicCamera = new THREE.OrthographicCamera(
 //   -(window.innerWidth / window.innerHeight), //left
@@ -67,6 +68,17 @@ export default function example() {
   camera.lookAt(mesh.position);
   scene.add(camera);
 
+  const gui = new dat.GUI();
+  gui.add(mesh.position, "y", -5, 5, 0.01).name("이동거리 - Y");
+  gui
+    .add(mesh.rotation, "y")
+    .min(0)
+    .max(2 * Math.PI)
+    .step(0.01)
+    .name("회전 - Y");
+
+  gui.add(camera.position, "z").min(0).max(10).step(1).name("카메라이동 - z");
+
   const clock = new THREE.Clock();
 
   function draw() {
@@ -75,6 +87,7 @@ export default function example() {
     // Math.PI / 180 = 1도
     const delta = clock.getDelta();
     mesh.rotation.y += delta;
+    camera.lookAt(mesh.position);
     renderer.render(scene, camera); // 복수의 카메라를 사용할 수 있음
     stats.update();
     renderer.setAnimationLoop(draw);
