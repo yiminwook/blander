@@ -53,10 +53,30 @@ export default function example() {
   scene.add(ambientLight);
 
   const geometry = new THREE.BoxGeometry(1, 1, 1);
-  const meterial = new THREE.MeshStandardMaterial({ color: "seagreen" });
-  const mesh = new THREE.Mesh(geometry, meterial);
-  mesh.position.set(1, 0, 0);
-  scene.add(mesh);
+  const meterial = new THREE.MeshStandardMaterial({ color: "hotpink" });
+
+  const group1 = new THREE.Group();
+  const box1 = new THREE.Mesh(geometry, meterial);
+
+  const group2 = new THREE.Group();
+  const box2 = box1.clone();
+  box2.scale.set(0.3, 0.3, 0.3);
+  group2.position.set(2, 0, 0);
+
+  const group3 = new THREE.Group();
+  const box3 = box2.clone();
+  box3.scale.set(0.15, 0.15, 0.15);
+  group3.position.set(0.5, 0, 0);
+
+  group3.add(box3);
+
+  group2.add(group3);
+  group2.add(box2);
+
+  group1.add(box1);
+  group1.add(group2);
+
+  scene.add(group1);
 
   const camera = new THREE.PerspectiveCamera(
     75, // FOV
@@ -65,13 +85,13 @@ export default function example() {
     1000 // Far
   );
   camera.position.set(1, 5, 5);
-  camera.lookAt(mesh.position);
+  camera.lookAt(box1.position);
   scene.add(camera);
 
   const gui = new dat.GUI();
-  gui.add(mesh.position, "y", -5, 5, 0.01).name("이동거리 - Y");
+  gui.add(box1.position, "y", -5, 5, 0.01).name("이동거리 - Y");
   gui
-    .add(mesh.rotation, "y")
+    .add(box1.rotation, "y")
     .min(0)
     .max(2 * Math.PI)
     .step(0.01)
@@ -86,8 +106,11 @@ export default function example() {
     // 1초에 360도 회전
     // Math.PI / 180 = 1도
     const delta = clock.getDelta();
-    mesh.rotation.y += delta;
-    camera.lookAt(mesh.position);
+    // group2.rotation.reorder("YXZ");
+    group3.rotation.y += delta;
+    group2.rotation.y += delta;
+    group1.rotation.y += delta;
+    camera.lookAt(box1.position);
     renderer.render(scene, camera); // 복수의 카메라를 사용할 수 있음
     stats.update();
     renderer.setAnimationLoop(draw);
